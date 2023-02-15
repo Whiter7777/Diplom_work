@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorization</title>
+    <link rel="stylesheet" href= "{% static 'css/auth_style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;700&display=swap" rel="stylesheet"> 
+</head>
+<body>
+    <header class="header">
+        <div class="logo_auth">
+            <img src="https://images.unsplash.com/photo-1597092451116-27787c07901d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80" alt="">
+        </div>
+    </header>
+    <main class="main">
+        <form method="POST" action = "user/">
+            {% csrf_token %}
+            <div class="aurh_title">
+                <p>Логин</p>
+            </div>
+            <div class="login">
+                <input class="login-field_input" id="text" type="text" name="username" placeholder="enter username">
+            </div>
+            <div class="aurh_title">
+                <p>Пароль</p>
+            </div>
+            <div class="password">
+                <input class="pass-field_input" id="password" type="password" name="password" placeholder="enter password">
+            </div>
+            <div class="button">
+                <button type="submit">ВОЙТИ</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>
