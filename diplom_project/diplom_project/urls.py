@@ -15,10 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
-from archive_app import views
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("auth/", views.index),
-    path("auth/user/", views.auth)
+    path("accounts/", include('accounts.urls')),
+    path("", include("archive_app.urls")),
 ]

@@ -27,10 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
+    "accounts",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -38,7 +38,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "archive_app",
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "django_mysql",
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -74,13 +80,37 @@ WSGI_APPLICATION = "diplom_project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+import configparser
+config = configparser.ConfigParser()
+configFilePath = "E:\Diplom_work\MySQL_config.ini"
+config.read(configFilePath)
+config.sections()
+name = config.get("MySQL_config", "name")
+username = config.get("MySQL_config", "username")
+password = config.get("MySQL_config", "password")
+host = config.get("MySQL_config", "host")
+port = config.get("MySQL_config", "port")
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        #"ENGINE": "django.db.backends.sqlite3",
+        #"NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": name, 
+        "USER": username,
+        "PASSWORD": password, 
+        "HOST": host, 
+        "PORT": port,
+    },
+    "main": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "main_db", 
+        "USER": username,
+        "PASSWORD": password, 
+        "HOST": host, 
+        "PORT": port,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -122,3 +152,5 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_REDIRECT_URL =  'login_success'
