@@ -1,8 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from .models import Location, RackType, Status
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 
 # Create your views here.
-def index(request):
+def test_auth(request):
     return render(request, "auth.html")
 
 def auth(request):
@@ -21,14 +23,23 @@ def manage(request):
         return redirect(main_archive)
 
 def archiving(request):
-    return render(request, "archiving.html")
-
+    if request.user.groups.filter(name="Laboratory").exists():
+        return render(request, "archiving.html")
+    else:
+        return redirect(main_archive)
+    
 def cleaning(request):
-    return render(request, "cleaning.html")
+    if request.user.groups.filter(name="Cleaning").exists():
+        return render(request, "cleaning.html")
+    else:
+        return redirect(main_archive)
 
 def viewing(request):
-    return render(request, "viewing.html")
-
+    if request.user.groups.filter(name="View").exists():
+        return render(request, "viewing.html")
+    else:
+        return redirect(main_archive)
+    
 def login_success(request):
     if request.user.groups.filter(name="Managment").exists():
         return redirect(manage)
@@ -41,8 +52,61 @@ def login_success(request):
     else:
         return redirect(main_archive)
 
+def index(request):
+    rack_types = RackType.objects.all()
+    return render(request, "index.html", {"rack_types": rack_types})
+    
 
-from django.db import connection
+def create(request):
+    if request.method == "POST":
+        rack_type = RackType()
+        rack_type.rack_type_name = request.POST.get("rack_type_name")
+        rack_type.cell_x = request.POST.get("cell_x")
+        rack_type.cell_y = request.POST.get("cell_y")
+        rack_type.color = request.POST.get("color")
+        rack_type.storage_time = request.POST.get("storage_time")
+        rack_type.location_id = request.POST.get("location")
+        rack_type.status_id = request.POST.get("status")
+        rack_type.description = request.POST.get("description")
+        rack_type.save()
+        return HttpResponseRedirect("/index")
+    locations = Location.objects.all()
+    statuses = Status.objects.all()
+    return render(request, "create.html", {"locations": locations, "statuses": statuses})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# from django.db import connection
 
 # with open("E:\Diplom_work\CONTAINER_TYPE.csv", "r") as inf:
 #     for line in inf:

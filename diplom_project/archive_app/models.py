@@ -1,4 +1,5 @@
 from django.db import models
+from colorfield.fields import ColorField
 
 class Status(models.Model):
     status = models.CharField(max_length=10)
@@ -16,10 +17,11 @@ class Location(models.Model):
 
 class RackType(models.Model):
     rack_type_name = models.CharField(max_length=100)
-    cell_x = models.IntegerField
-    cell_y = models.IntegerField
-    color = models.CharField(max_length=30)
-    storage_time = models.IntegerField
+    cell_x = models.IntegerField()
+    cell_y = models.IntegerField()
+    # color = models.CharField(max_length=30)
+    color = ColorField(default='#FF0000')
+    storage_time = models.IntegerField()
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     description = models.CharField(max_length=50)
