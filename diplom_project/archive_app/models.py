@@ -1,5 +1,6 @@
 from django.db import models
 from colorfield.fields import ColorField
+from datetime import date
 
 class Status(models.Model):
     status = models.CharField(max_length=10)
@@ -15,42 +16,52 @@ class Location(models.Model):
     def __str__(self):
         return self.location
 
-class RackType(models.Model):
-    rack_type_name = models.CharField(max_length=100)
-    cell_x = models.IntegerField()
-    cell_y = models.IntegerField()
-    # color = models.CharField(max_length=30)
-    color = ColorField(default='#FF0000')
-    storage_time = models.IntegerField()
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    status = models.ForeignKey(Status, on_delete=models.CASCADE)
-    description = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.rack_type_name
-
 class ContainerType(models.Model):
-    containet_type = models.CharField(max_length=30)
+    container_type = models.CharField(max_length=30)
     description = models.CharField(max_length=50)
-    rack_types = models.ManyToManyField(RackType)
 
     def __str__(self):
-        return self.containet_type
+        return self.container_type
 
 class Workflow(models.Model):
     workflow = models.CharField(max_length=50)
     description = models.CharField(max_length=50)
-    rack_types = models.ManyToManyField(RackType)
 
     def __str__(self):
         return self.workflow
 
-class AcrhiveRacks(models.Model):
-    rack_type_name = models.ForeignKey(RackType, on_delete=models.CASCADE)
-    barcode = models.CharField(max_length=25)
+class RackType(models.Model):
+    rack_type_name = models.CharField(max_length=100, unique=True)
+    cell_x = models.PositiveSmallIntegerField()
+    cell_y = models.PositiveSmallIntegerField()
+    # color = models.CharField(max_length=30)
+    color = ColorField(default='#FF0000')
+    storage_time = models.PositiveIntegerField()
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE)
+    container_types = models.ManyToManyField(ContainerType, through="RackType_ContainerType")
+    workflows = models.ManyToManyField(Workflow, through="RackType_Workflow")
+    description = models.CharField(max_length=50)
 
     def __str__(self):
         return self.rack_type_name
+
+class RackType_ContainerType(models.Model):
+    rack_type_name = models.ForeignKey(RackType, on_delete=models.CASCADE)
+    container_type = models.ForeignKey(ContainerType, on_delete=models.CASCADE)
+
+
+class RackType_Workflow(models.Model):
+    rack_type_name = models.ForeignKey(RackType, on_delete=models.CASCADE)
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
+    
+
+# class AcrhiveRacks(models.Model):
+#     rack_type_name = models.ForeignKey(RackType, on_delete=models.CASCADE)
+#     barcode = models.CharField(max_length=25)
+
+#     def __str__(self):
+#         return self.rack_type_name
 
 # class RealBase(models.Model):
 #     sample_number = models.IntegerField
