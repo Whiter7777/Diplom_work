@@ -1,5 +1,13 @@
 from mysql.connector import connect, Error
 from getpass import getpass
+import datetime
+ 
+x = datetime.datetime.now()
+ 
+y = x + datetime.timedelta(hours=48)
+ 
+print(x.strftime("%b %d %H:%M"))
+print(y.strftime("%b %d %H:%M"))
 
 class Employee():
     def __init__(self, name):

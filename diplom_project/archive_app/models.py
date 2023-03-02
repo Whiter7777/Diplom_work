@@ -56,31 +56,37 @@ class RackType_Workflow(models.Model):
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
     
 
-# class AcrhiveRacks(models.Model):
-#     rack_type_name = models.ForeignKey(RackType, on_delete=models.CASCADE)
-#     barcode = models.CharField(max_length=25)
+class AcrhiveRacks(models.Model):
+    rack_type_name = models.ForeignKey(RackType, on_delete=models.CASCADE)
+    close_data = models.DateTimeField()
+    barcode = models.CharField(max_length=25)
+    status = models.CharField(max_length=10, default="Open")
 
-#     def __str__(self):
-#         return self.rack_type_name
+    def __str__(self):
+        return str(self.rack_type_name)
 
-# class RealBase(models.Model):
-#     sample_number = models.IntegerField
-#     label_id = models.IntegerField
-#     status = models.CharField(max_length=5)
-#     received_by = models.CharField(max_length=50)
-#     location = models.CharField(max_length=20)
-#     template = models.CharField(max_length=20)
-#     containet_type = models.CharField(max_length=30)
-#     workflow = models.CharField(max_length=50)
+class Archive(models.Model):
+    archive_rack = models.ForeignKey(AcrhiveRacks,on_delete=models.CASCADE)
+    archiving_number = models.CharField(max_length=20)
+    coord_x = models.PositiveSmallIntegerField()
+    coord_y = models.PositiveSmallIntegerField()
 
-#     def __str__(self):
-#         return self.label_id
-
-#     class Meta:
-#         managed = False
-#         db_table = ""
+    def __str__(self):
+        return str(self.archiving_number)
 
 
+class MainDbTable(models.Model):
+    sample_number = models.CharField(max_length=10, blank=True, null=True)
+    label_id = models.CharField(max_length=20, blank=True, null=True)
+    x_status = models.CharField(max_length=10, blank=True, null=True)
+    received_by = models.CharField(max_length=50, blank=True, null=True)
+    location = models.CharField(max_length=20, blank=True, null=True)
+    template = models.CharField(max_length=20, blank=True, null=True)
+    containet_type = models.CharField(max_length=30, blank=True, null=True)
+    x_workflow = models.CharField(max_length=50, blank=True, null=True)
 
+    class Meta:
+        managed = False
+        db_table = 'main_db_table'
 
 

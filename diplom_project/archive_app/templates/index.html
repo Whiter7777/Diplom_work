@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>MANAGE</h1>
+
+    <div>
+        <ul class="sidebar-nav">
+            {% if user.is_authenticated %}
+                <li>User: {{ user.get_username }}</li>
+                <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div>
+        <h2>Список типов штативов</h2>
+        <table border="1">
+            <thead><th>ID типа штатива</th>
+                <th>Название</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Цвет</th>
+                <th>Время хранения</th>
+                <th>Локация</th>
+                <th>Статус</th>
+                <th>Тип контейнера</th>
+                <th>Поток</th>
+                <th>Описание</th></thead>
+            {% for rack_type in rack_types %}
+            <tr>
+                <td>{{ rack_type.id }}</td>
+                <td>{{ rack_type.rack_type_name }}</td>
+                <td>{{ rack_type.cell_x }}</td>
+                <td>{{ rack_type.cell_y }}</td>
+                <td>{{ rack_type.color }}</td>
+                <td>{{ rack_type.storage_time }}</td>
+                <td>{{ rack_type.location.location }}</td>
+                <td>{{ rack_type.status.status }}</td>
+                <td>
+                    {% for container_type in rack_type.container_types.all %}
+                        {{container_type.container_type}}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for workflow in rack_type.workflows.all %}
+                        {{workflow.workflow}}
+                    {% endfor %}
+                </td>    
+                <td>{{ rack_type.description }}</td>    
+                <td>
+                    <a href="delete_rack_type/{{rack_type.id}}">Удалить</a>
+                </td>        
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div>
+        <h2>Добавление штатива</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+            <p>
+                <label>Выберите Тип штатива</label><br>
+                <select name="rack_type_name">
+                {% for rack_type in rack_types %}
+                    <option value="{{rack_type.id}}">{{rack_type.rack_type_name}}</option>
+                {% endfor %}
+                </select>
+            </p>
+        </div>
+        <input type="submit" value="Сохранить" >
+    </form>
+    </div>
+    <div>
+        <h2>Список штативов</h2>
+        <table border="1">
+            <thead><th>ID штатива</th>
+                <th>ID типа штатива</th>
+                <th>Название типа штатива</th>
+                <th>Дата создания</th></thead>
+            {% for archive_rack in archive_racks %}
+            <tr>
+                <td>{{ archive_rack.id }}</td>
+                <td>{{ archive_rack.rack_type_name.id }}</td>
+                <td>{{ archive_rack.rack_type_name.rack_type_name }}</td>
+                <td>{{ archive_rack.close_data }}</td>
+                <td><a href="delete_archive_rack/{{archive_rack.id}}">Удалить</a></td>   
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+        
+</body>
+</html>

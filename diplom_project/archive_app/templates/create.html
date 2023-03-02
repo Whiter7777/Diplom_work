@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>MANAGE</h1>
+    
+    <div>
+        <ul class="sidebar-nav">
+            {% if user.is_authenticated %}
+                <li>User: {{ user.get_username }}</li>
+                <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div>
+        <h2>Добавление типов штатива</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+        <p>
+            <label>Введите название типа штатива</label><br>
+            <input type="text" name="rack_type_name" />
+        </p>
+        <p>
+            <label>Введите описание</label><br>
+            <input type="text" name="description" />
+        </p>  
+        <p>
+            <label>Введите количество ячеек X</label><br>
+            <input type="number" name="cell_x" />
+        </p>
+        <p>
+            <label>Введите количество ячеек Y</label><br>
+            <input type="number" name="cell_y" />
+        </p>
+        <p>
+            <label>Выберите цвет</label><br>
+            <input type="text" name="color" />
+        </p>
+        <p>
+            <label>Введите срок хранения</label><br>
+            <input type="number" name="storage_time" />
+        </p>    
+        <p>
+            <label>Выберите Локацию</label><br>
+            <select name="location">
+            {% for location in locations %}
+                <option value="{{location.id}}">{{location.location}}</option>
+            {% endfor %}
+            </select>
+        </p>
+        <p>
+            <label>Выберите Статус</label><br>
+            <select name="status">
+            {% for status in statuses %}
+                <option value="{{status.id}}">{{status.status}}</option>
+            {% endfor %}
+            </select>
+        </p>
+        </div>
+        <div>
+        <p>
+            <label>Выберите типы контейнера</label><br>
+            <div>
+            {% for container_type in container_types %}
+                <input type="checkbox" name="container_types" value="{{container_type.id}}" />{{container_type.container_type}} <br />
+            {% endfor %}
+            </div>
+        </p>
+        </div>
+        <div>       
+        <p>
+            <label>Выберите рабочие потоки</label><br>
+            <div>
+            {% for workflow in workflows %}
+                <input type="checkbox" name="workflows" value="{{workflow.id}}" />{{workflow.workflow}} <br />
+            {% endfor %}
+            </div>
+        </p>
+        </div>   
+        <input type="submit" value="Сохранить" >
+    </form>
+    </div>
+
+</body>
+</html>
