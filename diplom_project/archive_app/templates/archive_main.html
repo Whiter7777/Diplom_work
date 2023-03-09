@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+{% load static %}
+{% load index %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+    <style>
+    body{width: 50%;
+        margin-top: 20px;
+            margin-left: 40px;
+            margin-bottom: 20px;
+            margin-right: 40px;
+        }
+    .table {margin-top: 30px;
+
+    }
+
+    .red {background-color: rgb(13, 90, 45); color: white}
+    .green {background-color: rgb(235, 240, 209);}
+    table {border: 1px solid rgb(0, 0, 0); border-collapse: separate}
+        td {border: 1px solid rgb(0, 0, 0); font-size: 10px;}
+        td {padding: 15px 10px 15px;}
+        td {width: 50px;
+        text-align: center;}
+    </style>
+    <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+    <script>
+    $(function() {
+        $('td:contains("Full")').addClass('red');
+        $('td:contains("Empty")').addClass('green');
+    });
+    </script>
+
+</head>
+<body>
+    <h1>ARCHIVING</h1>
+    <div>
+        <div>
+            <ul class="sidebar-nav">
+                {% if user.is_authenticated %}
+                    <li>User: {{ user.get_username }}</li>
+                    <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <h2>Номер штатива: ID = {{ archive_rack }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <p>Введите номер пробы для архивации <br />
+                <input name="archiving_number" />
+            </p>
+            <input class="btn btn-success" type="submit" value="Отправить" />
+        </form>
+
+        <div class = "table">
+            <table>
+                {% for i in lst_y %}
+                    <tr>
+                        {% for j in lst_x %}
+                            <td>{{ status|index:i|index:j }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

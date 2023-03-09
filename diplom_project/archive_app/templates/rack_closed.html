@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rack_closed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+    <style>
+        a {text-decoration: none;}
+
+        .parent {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        .auth {
+            padding: 20px 20px 20px 20px;
+            margin-left: 20px;
+            background: lightgray;
+            border: solid 0.25px rgb(129, 129, 129);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="parent">
+    <h3>Данный штатив закрыт для архивации</h3>
+        <p>
+        <div class = auth>
+            <h4><a href="{% url 'archiving'%}?next={{request.path}}">Вернуться</a></h4>
+        </div>
+        </p>
+    </div>
+    
+</body>
+</html>
