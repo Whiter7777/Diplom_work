@@ -59,8 +59,10 @@ class RackType_Workflow(models.Model):
 class AcrhiveRacks(models.Model):
     rack_type_name = models.ForeignKey(RackType, on_delete=models.CASCADE)
     close_data = models.DateTimeField()
+    reset_date = models.DateTimeField()
     barcode = models.CharField(max_length=25)
     status = models.CharField(max_length=10, default="Open")
+
 
     def __str__(self):
         return str(self.rack_type_name)

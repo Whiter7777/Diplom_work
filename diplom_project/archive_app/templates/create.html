@@ -1,10 +1,52 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Create</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+    <style>
+        a {text-decoration: none;}
+        body {
+            margin-top: 20px;
+            margin-left: 40px;
+            margin-bottom: 20px;
+            margin-right: 40px;
+        }
+        
+        .check_ct, .check_wf {
+            border: solid 1px lightgray;
+            -webkit-column-width: 200px;
+            -moz-column-width: 200px;
+            column-width: 200px;
+            -webkit-column-count: 6;
+            -moz-column-count: 6;
+            column-count: 6;
+            -webkit-column-gap: 30px;
+            -moz-column-gap: 30px;
+            column-gap: 30px;
+            -webkit-column-rule: 1px solid #ccc;
+            -moz-column-rule: 1px solid #ccc;
+            column-rule: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        label {font-size: 20px;}
+        .select{
+            width: 20%;
+        }
+        .input{
+            width: 40%;
+        }
+
+    </style>
+
 </head>
 <body>
     <h1>MANAGE</h1>
@@ -21,72 +63,109 @@
     </div>
 
     <div>
-        <h2>Добавление типов штатива</h2>
+        <h4><a href="{% url 'index'%}?next={{request.path}}">Просмотр созданных штативов</a></h4>
+    </div>
+
+    <div>
+        <h3>Добавление типов штатива</h3>
     <form method="POST">
         {% csrf_token %}
-        <div>
+        <div class = "input">
         <p>
-            <label>Введите название типа штатива</label><br>
-            <input type="text" name="rack_type_name" />
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon1">Введите название типа штатива</label><br>
+                <input type="text" class="form-control" placeholder="Rack type name" aria-label="Username" aria-describedby="basic-addon1" name="rack_type_name" />
+            </div>
         </p>
         <p>
-            <label>Введите описание</label><br>
-            <input type="text" name="description" />
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon1">Введите описание</label><br>
+                <input type="text" class="form-control" placeholder="Description" aria-label="Username" aria-describedby="basic-addon1" name="description" />
+            </div>
         </p>  
         <p>
-            <label>Введите количество ячеек X</label><br>
-            <input type="number" name="cell_x" />
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon1">Введите количество ячеек X</label><br>
+                <input type="number" class="form-control" placeholder="Cell X" aria-label="Username" aria-describedby="basic-addon1" name="cell_x" />
+            </div>
         </p>
         <p>
-            <label>Введите количество ячеек Y</label><br>
-            <input type="number" name="cell_y" />
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon1">Введите количество ячеек Y</label><br>
+                <input type="number" class="form-control" placeholder="Cell Y" aria-label="Username" aria-describedby="basic-addon1" name="cell_y" />
+            </div>
         </p>
         <p>
-            <label>Выберите цвет</label><br>
-            <input type="text" name="color" />
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon1">Выберите цвет</label><br>
+                <input type="text" class="form-control" placeholder="Color" aria-label="Username" aria-describedby="basic-addon1" name="color" />
+            </div>
         </p>
         <p>
-            <label>Введите срок хранения</label><br>
-            <input type="number" name="storage_time" />
-        </p>    
-        <p>
-            <label>Выберите Локацию</label><br>
-            <select name="location">
-            {% for location in locations %}
-                <option value="{{location.id}}">{{location.location}}</option>
-            {% endfor %}
-            </select>
-        </p>
-        <p>
-            <label>Выберите Статус</label><br>
-            <select name="status">
-            {% for status in statuses %}
-                <option value="{{status.id}}">{{status.status}}</option>
-            {% endfor %}
-            </select>
+            <div class="input-group mb-3">
+            <label class="input-group-text" id="basic-addon1">Введите срок хранения</label><br>
+            <input type="number" class="form-control" placeholder="Storage time" aria-label="Username" aria-describedby="basic-addon1" name="storage_time" />
+            </div>
         </p>
         </div>
-        <div>
+        <div class = "select">    
+            <p>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="inputGroupSelect01">Выберите Локацию</label><br>
+                    <select class="form-select" id="inputGroupSelect01" name="location">
+                    {% for location in locations %}
+                        <option value="{{location.id}}">{{location.location}}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+            </p>
+        </div>
+        <div class = "select"> 
+            <p>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="inputGroupSelect01">Выберите Статус</label><br>
+                    <select class="form-select" id="inputGroupSelect01" name="status">
+                    {% for status in statuses %}
+                        <option value="{{status.id}}">{{status.status}}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+        </p>
+        </div>
+        
+
+        <label>Выберите типы контейнера</label><br>
+        <div class = check_ct>
         <p>
-            <label>Выберите типы контейнера</label><br>
-            <div>
+                        <div>
             {% for container_type in container_types %}
-                <input type="checkbox" name="container_types" value="{{container_type.id}}" />{{container_type.container_type}} <br />
+            <div class="input-group mb-3">
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" name="container_types" value="{{container_type.id}}" />{{container_type.container_type}} <br />
+                </div>
+            </div>    
             {% endfor %}
             </div>
         </p>
         </div>
-        <div>       
+
+        <label>Выберите рабочие потоки</label><br>
+        <div class = check_wf>       
         <p>
-            <label>Выберите рабочие потоки</label><br>
             <div>
             {% for workflow in workflows %}
-                <input type="checkbox" name="workflows" value="{{workflow.id}}" />{{workflow.workflow}} <br />
+            <div class="input-group mb-3">
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" name="workflows" value="{{workflow.id}}" />{{workflow.workflow}} <br />
+                </div>
+            </div>
             {% endfor %}
             </div>
         </p>
-        </div>   
-        <input type="submit" value="Сохранить" >
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <input class="btn btn-success me-md-2" type="submit" value="Сохранить" >
+        </div>
     </form>
     </div>
 

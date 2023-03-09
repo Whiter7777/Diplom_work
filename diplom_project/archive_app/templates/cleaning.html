@@ -1,10 +1,27 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cleaning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+    <style>
+        a {text-decoration: none;}
+        .table_div {width: 80%;}
+        body {
+            margin-top: 20px;
+            margin-left: 40px;
+            margin-bottom: 20px;
+            margin-right: 40px;
+        }
+        
+    </style>
+
 </head>
 <body>
     <h1>CLEANING</h1>
@@ -16,5 +33,36 @@
             <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
         {% endif %}
     </ul>
+
+    <div class="table_div">
+        <h2>Список штативов</h2>
+        <table class="table table-bordered border-primary">
+            <thead><th>ID штатива</th>
+                <th>ID типа штатива</th>
+                <th>Название типа штатива, цвет</th>
+                <th>Дата создания</th>
+                <th>Дата закрытия</th>
+                <th>Статус</th>
+                <th>Время хранения, часов</th>
+                <th>Готовность к сбросу</th>
+                <th>Действие</th></thead>
+            {% for archive_rack in archive_racks %}
+            <tr>
+                <td>{{ archive_rack.id }}</td>
+                <td>{{ archive_rack.rack_type_name.id }}</td>
+                <td>{{ archive_rack.rack_type_name.rack_type_name }}, {{ archive_rack.rack_type_name.color }}</td>
+                <td>{{ archive_rack.close_data }}</td>
+                <td>{{ archive_rack.reset_date }}</td>
+                <td>{{ archive_rack.status }}</td>
+                <td>{{ archive_rack.rack_type_name.storage_time }}</td>
+                <td>{{ archive_rack.barcode }}</td>
+                <td><a href="delete_archive/{{archive_rack.id}}">Очистить</a></td>   
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+
 </body>
 </html>

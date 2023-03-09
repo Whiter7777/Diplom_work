@@ -1,15 +1,26 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Login</title>
 </head>
 <body>
     {% extends "base.html" %}
-    
+
     {% block content %}
+    {% load static %}
+    <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
+
+    <style>
+        a {text-decoration: none;}
+        input{
+            margin: 7px;
+        }
+    </style>
 
     {% if form.errors %}
         <p>Your username and password didn't match. Please try again.</p>
@@ -23,6 +34,7 @@
             <p>Please login to see this page.</p>
         {% endif %}
     {% endif %}
+
 
     <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
@@ -39,8 +51,10 @@
     </tr>
     </table>
 
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next }}" />
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <input class="btn btn-success" type="submit" value="login" />
+        <input type="hidden" name="next" value="{{ next }}" />
+    </div>
     </form>
 
     {% endblock %}
