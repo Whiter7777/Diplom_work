@@ -3,8 +3,8 @@ from archive_app import views
 
 urlpatterns = [
     re_path(r'login_success/$', views.login_success, name='login_success'),
-    path("auth/", views.test_auth),
-    path("auth/user/", views.auth),
+    # path("auth/", views.test_auth),
+    # path("auth/user/", views.auth),
     path("", views.main_archive),
     path("index/", views.index, name="index"),
     path("create/", views.create, name="create"),

@@ -13,6 +13,7 @@
     <style>
         a {text-decoration: none;}
         .table_div {width: 70%;}
+        
         body {
             margin-top: 20px;
             margin-left: 40px;
@@ -22,30 +23,43 @@
         .select {
             width: 20%;
         }
+        
     </style>
 
 </head>
 <body>
-    <h1>MANAGE</h1>
-
-    <div>
-        <ul class="sidebar-nav">
-            {% if user.is_authenticated %}
-                <li>User: {{ user.get_username }}</li>
-                <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
-            {% else %}
-                <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
-            {% endif %}
-        </ul>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-10">
+                <h1>MANAGE</h1>
+            </div>
+            <div class="col-sm">
+                <ul class="sidebar-nav">
+                    {% if user.is_authenticated %}
+                        <li>User: {{ user.get_username }}</li>
+                        <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <span class="border border-primary"></span>
+        </div>
     </div>
 
-    <div>
-        <h3><a href="{% url 'create'%}?next={{request.path}}">Вернуться к созданию штативов</a></h3>
-    </div>
+    <p>
+        <div>
+            <h3><a href="{% url 'create'%}?next={{request.path}}" class="link-success">Вернуться к созданию штативов</a></h3>
+        </div>
+    </p>
 
-
+    <p>
+        <div>
+    <h3>Список типов штативов</h3>
+        </div>
+    </p>
+    
     <div>
-        <h2>Список типов штативов</h2>
         <table class="table table-bordered border-primary">
             <thead><th>ID типа штатива</th>
                 <th>Название</th>
@@ -89,7 +103,7 @@
     </div>
 
     <div>
-        <h2>Добавление штатива</h2>
+        <h3>Добавление штатива</h3>
     <form method="POST">
         {% csrf_token %}
         <div class = "select">
@@ -107,8 +121,10 @@
         <input class="btn btn-success" type="submit" value="Сохранить" >
     </form>
     </div>
+
+
     <div class="table_div">
-        <h2>Список штативов</h2>
+        <h3>Список штативов</h3>
         <table class="table table-bordered border-primary">
             <thead><th>ID штатива</th>
                 <th>ID типа штатива</th>

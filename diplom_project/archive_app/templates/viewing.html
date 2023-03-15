@@ -10,6 +10,12 @@
     <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </symbol>
+    </svg>
+
     <style>
         a {text-decoration: none;}
         body {
@@ -22,31 +28,78 @@
             margin-bottom: 20px;
         }
         
+        .alert{
+            width: 40%;
+        }
+
+        .p-3{
+            width: 40%;
+        }
+
+        .table{
+            width: 50%;
+        }
+
     </style>
 </head>
 <body>
-    <h1>VIEWING</h1>
-    <ul class="sidebar-nav">
-        {% if user.is_authenticated %}
-            <li>User: {{ user.get_username }}</li>
-            <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
-        {% else %}
-            <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
-        {% endif %}
-    </ul>
 
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-10">
+                <h1>VIEWING</h1>
+            </div>
+            <div class="col-sm">
+                <ul class="sidebar-nav">
+                    {% if user.is_authenticated %}
+                        <li>User: {{ user.get_username }}</li>
+                        <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <span class="border border-primary"></span>
+        </div>
+    </div>
+
+    <p>
     <form action="" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
         <input input class="btn btn-success" type="Submit" name="submit" value="Отправить"/>
     </form>
+    </p>
+
+    {% if messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="container text-center">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+    {% endif %}
 
     {% if submitbutton == "Отправить" %}
-    <h3>Report: {{ report }}</h3>    
-    <h3>Sample_number is {{ find_sample }}</h3>
-    <h3>Rack ID is {{ id }}</h3>
-    <h3>X coord is {{ x }}</h3>
-    <h3>Y coord is {{ y }}</h3>
+    <table class="table table-bordered border-primary">
+        <thead><th>Status</th>
+            <th>Sample_number</th>
+            <th>Rack ID</th>
+            <th>Color</th>
+            <th>X coord</th>
+            <th>Y coord</th></thead>
+        <tr>
+            <td>{{ report }}</td>
+            <td>{{ find_sample }}</td>
+            <td>{{ id }}</td>
+            <td>{{ color }}</td>
+            <td>{{ x }}</td>
+            <td>{{ y }}</td>
+        </tr>
+    </table>
     {% endif %}
 
 </body>

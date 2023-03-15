@@ -7,6 +7,7 @@ import datetime
 from datetime import timedelta
 from .forms import UserForm, FindSample
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 
 
 # Create your views here.
@@ -23,13 +24,13 @@ def login_success(request):
     else:
         return redirect(main_archive)
 
-def test_auth(request):
-    return render(request, "auth.html")
+# def test_auth(request):
+#     return render(request, "auth.html")
 
-def auth(request):
-    login = request.POST.get("username", "Undefined")
-    password = request.POST.get("password", "Undefined")
-    return HttpResponse(f"<h2>Login: {login} Password: {password}</h2>")
+# def auth(request):
+#     login = request.POST.get("username", "Undefined")
+#     password = request.POST.get("password", "Undefined")
+#     return HttpResponse(f"<h2>Login: {login} Password: {password}</h2>")
 
 def main_archive(request):
     return render(request, "base.html")
@@ -78,7 +79,10 @@ def create(request):
                 rack_type.workflows.set(workflows)
                 return HttpResponseRedirect("/index")
             except IntegrityError:
-                return HttpResponse("ERROR: rack_type_name already exists!")
+                messages.error(request, 'Тип штатива с таким именем уже существует')
+                # return HttpResponse("ERROR: rack_type_name already exists!")
+            except ValueError:
+                messages.error(request, 'Поля Cell X, Cell Y и Storage time должны быть заполнены')
         locations = Location.objects.all()
         statuses = Status.objects.all()
         container_types = ContainerType.objects.all().order_by("container_type")
@@ -117,14 +121,17 @@ def archivation(request):
         try:
             archive_racks = AcrhiveRacks.objects.get(id = archive_rack_id)
             if archive_racks.status == "Closed":
-                return HttpResponseRedirect("/rack_closed")
+                messages.error(request, 'Данный штатив закрыт для архивации')
+                return HttpResponseRedirect("/archiving")
                 # return HttpResponse(f"""
                 #         <div>Данный штатив закрыт для архивации</div>
                 #     """)
             elif archive_racks.status == "Open" and AcrhiveRacks.objects.filter(status="In work").exists():
-                return HttpResponse(f"""
-                        <div><h3>Есть незакрытые штативы в работе</h3></div>
-                    """)
+                messages.error(request, 'Сначала необходимо закрыть штативы со статусом "In Work"')
+                return HttpResponseRedirect("/archiving")
+                # return HttpResponse(f"""
+                #         <div><h3>Есть незакрытые штативы в работе</h3></div>
+                #     """)
             else:
                 with open("number.txt", "w") as file:
                     file.write(str(archive_rack_id))
@@ -140,7 +147,13 @@ def archivation(request):
                 #             <div>Y: {y}</div>
                 #         """)
         except AcrhiveRacks.DoesNotExist:
-            return HttpResponseNotFound("<h2>AcrhiveRacks not found</h2>")
+            messages.error(request, 'Такого штатива не существует')
+            return HttpResponseRedirect("/archiving")
+            # return HttpResponseNotFound("<h2>AcrhiveRacks not found</h2>")
+        except ValueError:
+            messages.error(request, 'Введено некорректное значение')
+            return HttpResponseRedirect("/archiving")
+
         
 
 def archiv_main(request):
@@ -222,6 +235,7 @@ def archiv_main(request):
             archive = Archive()
             archive.archive_rack = archive_racks
             archive.archiving_number = request.POST.get("archiving_number")
+            a = request.POST.get("archiving_number")
             archive.coord_x = coord_x
             archive.coord_y = coord_y
             
@@ -237,17 +251,24 @@ def archiv_main(request):
                 # print(main_container_type in lst_container_types)
                 # print(main_workflow in lst_workflows)
             try:
-                if main_location == archive_location and main_status == archive_status and main_container_type in lst_container_types and main_workflow in lst_workflows:
+                b =  Archive.objects.filter(archiving_number = a).exists()
+                if b:
+                    messages.error(request, 'Проба с таким номером уже заархивирована')
+                elif main_location == archive_location and main_status == archive_status and main_container_type in lst_container_types and main_workflow in lst_workflows:
                     archive.save()
                     return HttpResponseRedirect("/archiv_main")
                 else:
-                    return HttpResponse(f"""
-                            <div>Параметры пробы не соответствуют параметрам типа архивного штатива</div>
-                        """)
+                    messages.error(request, 'Параметры пробы не соответствуют параметрам типа архивного штатива')
+                    # return HttpResponseRedirect("/archiv_main")
+                    # return HttpResponse(f"""
+                    #         <div>Параметры пробы не соответствуют параметрам типа архивного штатива</div>
+                    #     """)
             except:
-                return HttpResponse(f"""
-                            <div>Данного номера не сущетвует</div>
-                        """)
+                    messages.error(request, 'Такого номера не существует')
+                    # return HttpResponseRedirect("/archiv_main")
+                # return HttpResponse(f"""
+                #             <div>Данного номера не существует</div>
+                #         """)
         
         # for i in range(len(status)):
         #     for j in range(len(status[i])):
@@ -295,22 +316,6 @@ def delete_archive(request, id):
             return HttpResponseNotFound("<h2>Archive not found</h2>")
 
 
-    # rack_closed = AcrhiveRacks.objects.filter(id = archive_rack_id).update(status="Closed")
-        # archive_racks = AcrhiveRacks.objects.get(id = archive_rack_id)
-        # archive_rack = archive_racks.id
-        # # print(archive_rack)
-        # rack_status = archive_racks.status
-        # # print(rack_status)
-        # # print(archive_rack)
-        # rack_type_name = archive_racks.rack_type_name
-        # # print(rack_type_name)
-        # rack_type = RackType.objects.get(rack_type_name = rack_type_name)
-        # x = rack_type.cell_x
-        # # print(x)
-        # y = rack_type.cell_y
-
-
-
 def viewing(request):
     if request.user.groups.filter(name="View").exists():
         submitbutton= request.POST.get("submit")
@@ -319,21 +324,25 @@ def viewing(request):
         id = ""
         x = ""
         y = ""
+        color = ""
         form = FindSample(request.POST or None)
         try:
             if form.is_valid():
                 find_sample = str(form.cleaned_data.get("find_sample"))
                 sample_number = Archive.objects.get(archiving_number = find_sample)
-                report = "Sample found"
+                report = "Номер найден"
                 id = sample_number.archive_rack.id
                 x = sample_number.coord_x
                 y = sample_number.coord_y
-            context= {"report":report, "id": id, "x": x, "y": y, 'form': form, 'find_sample': find_sample,'submitbutton': submitbutton}
+                color = sample_number.archive_rack.rack_type_name.color
+            context= {"color": color, "report":report, "id": id, "x": x, "y": y, 'form': form, 'find_sample': find_sample,'submitbutton': submitbutton}
             return render(request, "viewing.html", context)
         except:
-            report = "Sample not found"
-            context= {"report":report, 'form': form, 'submitbutton': submitbutton}
-            return render(request, "viewing.html", context)
+            messages.error(request, 'Номер не найден')
+            return HttpResponseRedirect("/viewing")
+            # report = "Sample not found"
+            # context= {"report":report, 'form': form, 'submitbutton': submitbutton}
+            # return render(request, "viewing.html", context)
     else:
         return redirect(main_archive)
 
