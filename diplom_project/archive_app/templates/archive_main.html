@@ -31,6 +31,10 @@
             width: 40%;
         }
 
+        img{
+            width: 60px;
+        }
+        
     .input-group{
             width: 40%;
         }
@@ -56,10 +60,13 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-sm-10">
+            <div class="col-sm-1">
+                <img src="https://cdn-icons-png.flaticon.com/512/900/900626.png?w=826&t=st=1679244532~exp=1679245132~hmac=1b8c11fc22a3fce7b78b6d05df2aaf4fcf15d83a8efec95e066fe73f296bbf3a">
+            </div>
+            <div class="col-sm-9">
                 <h1>ARCHIVING</h1>
             </div>
-            <div class="col-sm">
+            <div class="col-sm-2">
                 <ul class="sidebar-nav">
                     {% if user.is_authenticated %}
                         <li>User: {{ user.get_username }}</li>

@@ -1,6 +1,5 @@
 from django.db import models
 from colorfield.fields import ColorField
-from datetime import date
 
 class Status(models.Model):
     status = models.CharField(max_length=10)

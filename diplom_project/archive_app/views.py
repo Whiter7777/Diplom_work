@@ -1,18 +1,13 @@
-from django.http import HttpResponse
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from .models import Location, RackType, Status, ContainerType, Workflow, AcrhiveRacks, Archive, MainDbTable
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 import datetime
-from datetime import timedelta
-from .forms import UserForm, FindSample
-from django.core.exceptions import ObjectDoesNotExist
+from .forms import FindSample
 from django.contrib import messages
 
-
-# Create your views here.
-
 def login_success(request):
+    """Логин на нужную страницу в зависимости от группы пользователей"""
     if request.user.groups.filter(name="Managment").exists():
         return redirect(create)
     elif request.user.groups.filter(name="Laboratory").exists():
@@ -24,25 +19,11 @@ def login_success(request):
     else:
         return redirect(main_archive)
 
-# def test_auth(request):
-#     return render(request, "auth.html")
-
-# def auth(request):
-#     login = request.POST.get("username", "Undefined")
-#     password = request.POST.get("password", "Undefined")
-#     return HttpResponse(f"<h2>Login: {login} Password: {password}</h2>")
-
 def main_archive(request):
     return render(request, "base.html")
 
-def manage(request):
-    #if request.user.get_username() == "Manager":
-    if request.user.groups.filter(name="Managment").exists():
-        return render(request, "manage.html")
-    else:
-        return redirect(main_archive)
-
 def index(request):
+    """Создание штатива"""
     if request.user.groups.filter(name="Managment").exists():
         if request.method == "POST":
             archive_rack = AcrhiveRacks()
@@ -58,6 +39,7 @@ def index(request):
         return redirect(main_archive)
 
 def create(request):
+    """Создание типа штатива"""
     if request.user.groups.filter(name="Managment").exists():
         if request.method == "POST":
             rack_type = RackType()
@@ -80,7 +62,6 @@ def create(request):
                 return HttpResponseRedirect("/index")
             except IntegrityError:
                 messages.error(request, 'Тип штатива с таким именем уже существует')
-                # return HttpResponse("ERROR: rack_type_name already exists!")
             except ValueError:
                 messages.error(request, 'Поля Cell X, Cell Y и Storage time должны быть заполнены')
         locations = Location.objects.all()
@@ -92,6 +73,7 @@ def create(request):
         return redirect(main_archive)
     
 def delete_rack_type(request, id):
+    """Удаление типа штатива"""
     try:
         rack_type = RackType.objects.get(id=id)
         rack_type.delete()
@@ -100,6 +82,7 @@ def delete_rack_type(request, id):
             return HttpResponseNotFound("<h2>RackType not found</h2>")
 
 def delete_archive_rack(request, id):
+    """Удаление штатива"""
     try:
         archive_rack = AcrhiveRacks.objects.get(id=id)
         archive_rack.delete()
@@ -109,6 +92,7 @@ def delete_archive_rack(request, id):
 
 
 def archiving(request):
+    """Вывод всех штативов"""
     if request.user.groups.filter(name="Laboratory").exists():
         archive_racks = AcrhiveRacks.objects.all()
         return render(request, "archiving.html", {"archive_racks": archive_racks})
@@ -116,6 +100,7 @@ def archiving(request):
         return redirect(main_archive)
     
 def archivation(request):
+    """Выбор штатива для архивации"""
     if request.method == "POST":
         archive_rack_id = request.POST.get("archive_rack_id", "Undefined")
         try:
@@ -123,56 +108,33 @@ def archivation(request):
             if archive_racks.status == "Closed":
                 messages.error(request, 'Данный штатив закрыт для архивации')
                 return HttpResponseRedirect("/archiving")
-                # return HttpResponse(f"""
-                #         <div>Данный штатив закрыт для архивации</div>
-                #     """)
             elif archive_racks.status == "Open" and AcrhiveRacks.objects.filter(status="In work").exists():
                 messages.error(request, 'Сначала необходимо закрыть штативы со статусом "In Work"')
                 return HttpResponseRedirect("/archiving")
-                # return HttpResponse(f"""
-                #         <div><h3>Есть незакрытые штативы в работе</h3></div>
-                #     """)
             else:
                 with open("number.txt", "w") as file:
                     file.write(str(archive_rack_id))
-                # archive_rack = archive_racks.id
-                # rack_type_name = archive_racks.rack_type_name
-                # rack_type = RackType.objects.get(rack_type_name = rack_type_name)
-                # x = rack_type.cell_x
-                # y = rack_type.cell_y
                 return HttpResponseRedirect("/archiv_main")
-                # return HttpResponse(f"""
-                #             <div>Номер штатива: {archive_rack}</div>
-                #             <div>X: {x}</div>
-                #             <div>Y: {y}</div>
-                #         """)
         except AcrhiveRacks.DoesNotExist:
             messages.error(request, 'Такого штатива не существует')
             return HttpResponseRedirect("/archiving")
-            # return HttpResponseNotFound("<h2>AcrhiveRacks not found</h2>")
         except ValueError:
             messages.error(request, 'Введено некорректное значение')
             return HttpResponseRedirect("/archiving")
 
         
-
 def archiv_main(request):
+    """непосредственно архивация"""
     if request.user.groups.filter(name="Laboratory").exists():
         with open("number.txt", "r") as file:
             archive_rack_id = int(file.read())
         archive_racks = AcrhiveRacks.objects.get(id = archive_rack_id)
         archive_rack = archive_racks.id
-        # print(archive_rack)
         rack_status = archive_racks.status
-        # print(rack_status)
-        # print(archive_rack)
         rack_type_name = archive_racks.rack_type_name
-        # print(rack_type_name)
         rack_type = RackType.objects.get(rack_type_name = rack_type_name)
         x = rack_type.cell_x
-        # print(x)
         y = rack_type.cell_y
-        # print(y)
         archive_location = rack_type.location.location
         archive_container_types = rack_type.container_types
         lst_container_types = []
@@ -183,17 +145,11 @@ def archiv_main(request):
         archive_workflows = rack_type.workflows
         for i in archive_workflows.all():
             lst_workflows.append(i.workflow)
-        # print(archive_location)
-        # print(archive_status)
-        # print(lst_container_types)
-        # print(lst_workflows)
         lst_x = [i for i in range(x)]
         lst_y = [i for i in range(y)]
-
         try:
             latest_archiv = Archive.objects.latest("id")
             rack_in_work = AcrhiveRacks.objects.filter(id = archive_rack_id).update(status="In work")
-            
             if latest_archiv.archive_rack.id != archive_rack:
                 status = [["Empty" for j in lst_x] for i in lst_y]
                 coord_x = 1
@@ -202,7 +158,6 @@ def archiv_main(request):
                 x_fact = latest_archiv.coord_x
                 y_fact = latest_archiv.coord_y
                 status = [["Empty" for j in lst_x] for i in lst_y]
-
                 for i in range(len(status)):
                     for j in range(len(status[i])):
                         status[i][j] = "Full"
@@ -210,15 +165,11 @@ def archiv_main(request):
                             break
                     if i == y_fact-1 and j == x_fact-1:
                         break
-
                 if x_fact + 1 > x:
                     if y_fact + 1 > y:
                         rack_closed = AcrhiveRacks.objects.filter(id = archive_rack_id).update(status="Closed")
                         date_closed = AcrhiveRacks.objects.filter(id = archive_rack_id).update(reset_date=datetime.datetime.now())
                         return HttpResponseRedirect("/rack_closed")
-                    #     return HttpResponse(f"""
-                    #     <div>Данный штатив закрыт для архивации</div>
-                    # """)
                     else:
                         coord_x = 1
                         coord_y = y_fact + 1
@@ -246,10 +197,6 @@ def archiv_main(request):
                 main_container_type = i.containet_type
                 main_status = i.x_status
                 main_workflow = i.x_workflow
-                # print(main_location == archive_location)
-                # print(main_status == archive_status)
-                # print(main_container_type in lst_container_types)
-                # print(main_workflow in lst_workflows)
             try:
                 b =  Archive.objects.filter(archiving_number = a).exists()
                 if b:
@@ -259,20 +206,8 @@ def archiv_main(request):
                     return HttpResponseRedirect("/archiv_main")
                 else:
                     messages.error(request, 'Параметры пробы не соответствуют параметрам типа архивного штатива')
-                    # return HttpResponseRedirect("/archiv_main")
-                    # return HttpResponse(f"""
-                    #         <div>Параметры пробы не соответствуют параметрам типа архивного штатива</div>
-                    #     """)
             except:
                     messages.error(request, 'Такого номера не существует')
-                    # return HttpResponseRedirect("/archiv_main")
-                # return HttpResponse(f"""
-                #             <div>Данного номера не существует</div>
-                #         """)
-        
-        # for i in range(len(status)):
-        #     for j in range(len(status[i])):
-        #         status[coord_y-1][coord_x-1] = "Full"
 
         return render(request, "archive_main.html", {
             "archive_rack": archive_rack,
@@ -287,10 +222,12 @@ def archiv_main(request):
 
 
 def rack_closed(request):
+    """Страница штатив 'закрыт'"""
     return render(request, "rack_closed.html")
 
 
 def cleaning(request):
+    """Очистка штатива"""
     if request.user.groups.filter(name="Cleaning").exists():
         data_now = datetime.datetime.now()
         archive_racks = AcrhiveRacks.objects.filter(status = "Closed")
@@ -306,6 +243,7 @@ def cleaning(request):
 
 
 def delete_archive(request, id):
+    """Удаление пробирок из штатива"""
     try:
         archives = Archive.objects.filter(archive_rack = id)
         for i in archives:
@@ -317,6 +255,7 @@ def delete_archive(request, id):
 
 
 def viewing(request):
+    """Поиск по номеру пробирки в архиве"""
     if request.user.groups.filter(name="View").exists():
         submitbutton= request.POST.get("submit")
         find_sample = ""
@@ -340,94 +279,7 @@ def viewing(request):
         except:
             messages.error(request, 'Номер не найден')
             return HttpResponseRedirect("/viewing")
-            # report = "Sample not found"
-            # context= {"report":report, 'form': form, 'submitbutton': submitbutton}
-            # return render(request, "viewing.html", context)
     else:
         return redirect(main_archive)
-
-
-# def viewing(request):
-#     if request.user.groups.filter(name="View").exists():
-#         submitbutton= request.POST.get("submit")
-#         find_sample = ""
-#         report = ""
-#         id = ""
-#         x = ""
-#         y = ""
-#         form = FindSample(request.POST or None)
-#         if form.is_valid():
-#             find_sample = str(form.cleaned_data.get("find_sample"))
-#             sample_number = Archive.objects.get(archiving_number = find_sample)
-#             report = "Sample found"
-#             id = sample_number.archive_rack.id
-#             x = sample_number.coord_x
-#             y = sample_number.coord_y
-#         context= {"report":report, "id": id, "x": x, "y": y, 'form': form, 'find_sample': find_sample,'submitbutton': submitbutton}
-#         return render(request, "viewing.html", context)
-#     else:
-#         return redirect(main_archive)
-
-
-
-
-# labels = MainDbTable.objects.using("main").all()
-# labels = labels.filter(sample_number = "246344068")
-# for i in labels:
-#     main_location = i.location
-#     main_container_type = i.containet_type
-#     main_status = i.x_status
-#     main_workflow = i.x_workflow
-# print(main_location, main_container_type, main_status, main_workflow)
-
-# from django.db import connection
-
-# with open("E:\Diplom_work\CONTAINER_TYPE.csv", "r") as inf:
-#     for line in inf:
-#         line = (line.strip().split(";"))
-
-#         reviewers_records = [(line[0], "Null")]
-#         insert_archiv_table_query = """
-#             INSERT INTO archive_app_containertype (container_type, description)
-#             VALUES ( %s, %s )
-#         """
-#         with connection.cursor() as cursor:
-#             cursor.executemany(insert_archiv_table_query, reviewers_records)
-
-# with open("E:\Diplom_work\LOCATION.csv", "r") as inf:
-#     for line in inf:
-#         line = (line.strip().split(";"))
-
-#         reviewers_records = [(line[0], "Null")]
-#         insert_archiv_table_query = """
-#             INSERT INTO archive_app_location (location, description)
-#             VALUES ( %s, %s )
-#         """
-#         with connection.cursor() as cursor:
-#             cursor.executemany(insert_archiv_table_query, reviewers_records)
-
-# with open("E:\Diplom_work\STATUS.csv", "r") as inf:
-#     for line in inf:
-#         line = (line.strip().split(";"))
-
-#         reviewers_records = [(line[0], line[1])]
-#         insert_archiv_table_query = """
-#             INSERT INTO archive_app_status (status, description)
-#             VALUES ( %s, %s )
-#         """
-#         with connection.cursor() as cursor:
-#             cursor.executemany(insert_archiv_table_query, reviewers_records)
-
-# with open("E:\Diplom_work\X_WORKFLOW.csv", "r") as inf:
-#     for line in inf:
-#         line = (line.strip().split(";"))
-
-#         reviewers_records = [(line[0], "Null")]
-#         insert_archiv_table_query = """
-#             INSERT INTO archive_app_workflow (workflow, description)
-#             VALUES ( %s, %s )
-#         """
-#         with connection.cursor() as cursor:
-#             cursor.executemany(insert_archiv_table_query, reviewers_records)
 
 
